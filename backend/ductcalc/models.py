@@ -17,3 +17,7 @@ class DuctSegment:
     def velocity_fpm(self):
         return self.airflow_cfm / self.area_sqft
     
+    @property
+    def velocity_pressure_inwg(self):
+        return (self.velocity_fpm / 4005) ** 2
+    
