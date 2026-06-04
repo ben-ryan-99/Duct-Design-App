@@ -25,7 +25,6 @@ class DuctSegment:
 
 @dataclass
 class Fitting:
-    name: str
     fitting_type: str
     airflow_cfm: float
     diameter_in: float
