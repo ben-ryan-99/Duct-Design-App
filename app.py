@@ -67,32 +67,39 @@ selected_fitting_id = st.selectbox(
 )
 
 
-if st.button("Add Duct"):
-    st.session_state["path_items"].append(
-        {
-            "type": "duct",
-            "length_ft": length_ft,
-            "diameter_in": diameter_in,
-            "airflow_cfm": airflow_cfm,
-        }
-    )
+col1, col2, col3, col4 = st.columns(4)
 
-if st.button("Add Fitting"):
-    st.session_state["path_items"].append(
-        {
-            "type": "fitting",
-            "fitting_type": selected_fitting_id,
-            "diameter_in": diameter_in,
-            "airflow_cfm": airflow_cfm,
-        }
-    )
+with col1:
+    if st.button("Add Duct"):
+        st.session_state["path_items"].append(
+            {
+                "type": "duct",
+                "length_ft": length_ft,
+                "diameter_in": diameter_in,
+                "airflow_cfm": airflow_cfm,
+            }
+        )
 
-if st.button("Clear Path"):
-    st.session_state["path_items"] = []
-    duct_count = 0
-    fitting_count = 0
-    st.rerun()
+with col2:
+    if st.button("Add Fitting"):
+        st.session_state["path_items"].append(
+            {
+                "type": "fitting",
+                "fitting_type": selected_fitting_id,
+                "diameter_in": diameter_in,
+                "airflow_cfm": airflow_cfm,
+            }
+        )
 
+with col3:
+    if st.button ("Clear Path"):
+        st.session_state["path_items"] = []
+        duct_count = 0
+        fitting_count = 0
+        st.rerun()
+
+with col4:
+    calculate  = st.button("Calculate")
 
 
 
@@ -115,28 +122,8 @@ for i, item in enumerate(st.session_state["path_items"]):
         )
 
 
-
-##### Export JSON
-# st.subheader("Export JSON")
-
-# path_json = json.dumps(
-#     st.session_state["path_items"],
-#     indent=2,
-# )
-
-# st.code(path_json, language="json")
-
-# st.download_button(
-#     label="Download Path JSON",
-#     data=path_json,
-#     file_name="duct_path.json",
-#     mime="application/json",
-# )
-#####
-
-
 ######  Calculation
-if st.button("Calculate"):
+if calculate:
     path_items = []
 
     for item in st.session_state["path_items"]:
