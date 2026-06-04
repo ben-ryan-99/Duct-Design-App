@@ -21,3 +21,23 @@ class DuctSegment:
     def velocity_pressure_inwg(self):
         return (self.velocity_fpm / 4005) ** 2
     
+
+@dataclass
+class Fitting:
+    name: str
+    loss_coefficient: float
+    airflow_cfm: float
+    diameter_in: float
+
+    @property
+    def area_sqft(self):
+        diameter_ft = self.diameter_in / 12
+        return math.pi * (diameter_ft **2) / 4
+    
+    @property
+    def velocity_fpm(self):
+        return self.airflow_cfm / self.area_sqft
+
+    @property
+    def velocity_pressure_inwg(self):
+        return (self.velocity_fpm / 4005) ** 2
