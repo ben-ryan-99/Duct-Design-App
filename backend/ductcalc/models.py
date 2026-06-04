@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import math
+from backend.ductcalc.fitting_db import get_loss_coefficient
 
 
 @dataclass
@@ -25,7 +26,7 @@ class DuctSegment:
 @dataclass
 class Fitting:
     name: str
-    loss_coefficient: float
+    fitting_type: str
     airflow_cfm: float
     diameter_in: float
 
@@ -41,6 +42,11 @@ class Fitting:
     @property
     def velocity_pressure_inwg(self):
         return (self.velocity_fpm / 4005) ** 2
+    
+    @property
+    def loss_coefficient(self):
+        return get_loss_coefficient(self.fitting_type)
+    
     
 @dataclass
 class Path:
