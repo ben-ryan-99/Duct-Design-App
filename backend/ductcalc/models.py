@@ -41,3 +41,8 @@ class Fitting:
     @property
     def velocity_pressure_inwg(self):
         return (self.velocity_fpm / 4005) ** 2
+    
+@dataclass
+class Path:
+    name: str
+    items: list

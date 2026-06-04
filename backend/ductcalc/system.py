@@ -34,3 +34,30 @@ def calculate_system_pressure_drop(items):
         "items": results,
         "total_pressure_drop_inwg": total_pressure_drop,
     }
+
+def calculate_path_pressure_drop(path):
+    system_result = calculate_system_pressure_drop(path.items)
+
+    return {
+            "path_name": path.name,
+            "items": system_result["items"],
+            "total_pressure_drop_inwg": system_result["total_pressure_drop_inwg"],
+    }
+
+def calculate_critical_path(paths):
+    path_results = []
+
+    for path in paths:
+        path_result = calculate_path_pressure_drop(path)
+        path_results.append(path_result)
+
+    critical_path = max(
+        path_results,
+        key=lambda result: result["total_pressure_drop_inwg"],
+    )
+
+    return {
+        "paths": path_results,
+        "critical_path_name": critical_path["path_name"],
+        "critical_path_pressure_drop_inwg": critical_path["total_pressure_drop_inwg"],
+    }
