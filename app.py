@@ -2,6 +2,7 @@ import streamlit as st
 
 from ductcalc.models import DuctSegment, Fitting, Path
 from ductcalc.system import calculate_path_pressure_drop
+from ductcalc.fitting_db import FITTINGS
 
 
 st.title("Duct Pressure Drop Calculator")
@@ -14,13 +15,11 @@ airflow_cfm = st.number_input("Airflow (CFM)", min_value=0.0, value=1000.0)
 
 st.subheader("Fitting")
 
-fitting_type = st.selectbox(
+
+selected_fitting_id = st.selectbox(
     "Fitting Type",
-    [
-        "round_90_elbow",
-        "round_45_elbow",
-        "supply_diffuser",
-    ],
+    options=list(FITTINGS.keys()),
+    format_func=lambda x: FITTINGS[x]["name"]
 )
 
 if st.button("Calculate"):
@@ -31,7 +30,7 @@ if st.button("Calculate"):
     )
 
     fitting = Fitting(
-        fitting_type=fitting_type,
+        fitting_type=selected_fitting_id,
         diameter_in=diameter_in,
         airflow_cfm=airflow_cfm,
     )
