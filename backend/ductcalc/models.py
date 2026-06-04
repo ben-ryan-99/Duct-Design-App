@@ -7,6 +7,7 @@ class DuctSegment:
     length_ft: float
     diameter_in: float
     airflow_cfm: float
+    #duct_id: float
 
     @property
     def area_sqft(self):
@@ -27,6 +28,7 @@ class Fitting:
     fitting_type: str
     airflow_cfm: float
     diameter_in: float
+    #fitting_id: float
 
     @property
     def area_sqft(self):
