@@ -1,14 +1,53 @@
 import streamlit as st
+import json
 
 from ductcalc.models import DuctSegment, Fitting, Path
 from ductcalc.system import calculate_path_pressure_drop
 from ductcalc.fitting_db import FITTINGS, get_fitting
 
-duct_count = 0
-fitting_count = 0
-
 if "path_items" not in st.session_state:
     st.session_state["path_items"] = []
+
+###### Import or export path from JSON text
+with st.expander("Import / Export JSON", expanded=False):
+    st.subheader("Import JSON")
+
+    json_input = st.text_area(
+        "Paste path JSON here",
+        height=150,
+        placeholder='[{"type": "duct", "length_ft": 100, "diameter_in": 12, "airflow_cfm": 1000}]',
+    )
+
+    if st.button("Import JSON"):
+        try:
+            imported_items = json.loads(json_input)
+
+            if not isinstance(imported_items, list):
+                st.error("JSON must be a list of path items.")
+            else:
+                st.session_state["path_items"] = imported_items
+                st.success("Path imported successfully.")
+                st.rerun()
+
+        except json.JSONDecodeError as error:
+            st.error(f"Invalid JSON: {error}")
+
+    st.subheader("Export JSON")
+
+    path_json = json.dumps(
+        st.session_state["path_items"],
+        indent=2,
+    )
+
+    st.code(path_json, language="json")
+
+    st.download_button(
+        label="Download Path JSON",
+        data=path_json,
+        file_name="duct_path.json",
+        mime="application/json",
+    )
+#########
 
 st.title("Duct Pressure Drop Calculator")
 
@@ -29,26 +68,22 @@ selected_fitting_id = st.selectbox(
 
 
 if st.button("Add Duct"):
-    duct_count += 1
     st.session_state["path_items"].append(
         {
             "type": "duct",
             "length_ft": length_ft,
             "diameter_in": diameter_in,
             "airflow_cfm": airflow_cfm,
-            #"duct_id": duct_count,
         }
     )
 
 if st.button("Add Fitting"):
-    fitting_count +=1
     st.session_state["path_items"].append(
         {
             "type": "fitting",
             "fitting_type": selected_fitting_id,
             "diameter_in": diameter_in,
             "airflow_cfm": airflow_cfm,
-            #"fitting_id": fitting_count
         }
     )
 
@@ -81,6 +116,23 @@ for i, item in enumerate(st.session_state["path_items"]):
 
 
 
+##### Export JSON
+# st.subheader("Export JSON")
+
+# path_json = json.dumps(
+#     st.session_state["path_items"],
+#     indent=2,
+# )
+
+# st.code(path_json, language="json")
+
+# st.download_button(
+#     label="Download Path JSON",
+#     data=path_json,
+#     file_name="duct_path.json",
+#     mime="application/json",
+# )
+#####
 
 
 ######  Calculation
