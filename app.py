@@ -158,6 +158,12 @@ if canvas_result.json_data is not None:
 
     objects = canvas_result.json_data.get("objects",[])
 
+    pixels_per_foot = st.number_input(
+        "Drawing Scale (pixels per foot)",
+        min_value=1.0,
+        value=10.0,
+    )
+
     for obj in objects:
 
         if obj["type"] == "line":
@@ -175,6 +181,15 @@ if canvas_result.json_data is not None:
             st.write(
                 f"Line Length: {pixel_length:.1f} pixels"
             )
+
+            
+            
+            length_ft = pixel_length / pixels_per_foot
+
+            st.write(
+                f"Length: {length_ft:.1f} ft"
+            )
+
     st.write(canvas_result.json_data)
 
 #####
