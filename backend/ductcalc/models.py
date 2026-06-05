@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import math
-from backend.ductcalc.fitting_db import get_loss_coefficient
+from ductcalc.fitting_db import get_loss_coefficient
 
 @dataclass
 class DuctSegment:
