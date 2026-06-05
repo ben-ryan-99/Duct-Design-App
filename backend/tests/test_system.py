@@ -10,10 +10,9 @@ def test_system_pressure_drop():
             airflow_cfm=1000,
         ),
         Fitting(
-            name="Round elbow",
-            loss_coefficient=0.25,
-            diameter_in=12,
-            airflow_cfm=1000,
+            fitting_type = "round_90_elbow",
+            airflow_cfm = 1000,
+            diameter_in = 12
         ),
     ]
 

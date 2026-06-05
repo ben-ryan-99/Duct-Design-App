@@ -56,6 +56,21 @@ def segments_connected(seg1, seg2):
                 return True
     return False
 
+# Depth first search function
+def dfs(segment_id, adjacency, visited, current_path):
+    
+    visited.add(segment_id)
+
+    current_path.append(segment_id)
+
+    for neighbor in adjacency.get(segment_id,[]):
+        if neighbor not in visited:
+            dfs(
+                neighbor,
+                adjacency,
+                visited,
+                current_path
+            )
 
 ###################################################################################################################
 # Code
@@ -326,8 +341,52 @@ for conn in connections:
     st.write(
         f"Segment {conn[0]} <> Segment {conn[1]}"
     )
+
+adjacency = {}
+visited = set()
+for seg1,seg2 in connections:
+    if seg1 not in adjacency:
+        adjacency[seg1] = []
+    if seg2 not in adjacency:
+        adjacency[seg2] = []
+
+    adjacency[seg1].append(seg2)
+    adjacency[seg2].append(seg1)
     
-    #st.write(canvas_result.json_data)
+paths = []
+
+for segment_id in adjacency:
+    if segment_id not in visited:
+        current_path = []
+        dfs(
+            segment_id,
+            adjacency,
+            visited,
+            current_path
+        )
+
+        paths.append(current_path)
+
+
+st.subheader("canvas debug")
+st.write("segments")
+for segment in segments:
+    st.write(
+        f"Segment {segment['id']}: "
+        f"({segment['x1']:.1f}, {segment['y1']:.1f})"
+        f"to "
+        f"({segment['x2']:.1f}, {segment['y2']:.1f})"
+    )
+
+st.write("connections")
+for seg1,seg2 in connections:
+    st.write(f"Segment {seg1} connects to Segment {seg2}")
+
+st.write("grouped paths")
+for i, path in enumerate(paths, start=1):
+    st.write(f"Path {i}: Segments {path}")
+
+#st.write(canvas_result.json_data)
 
 #####
 
