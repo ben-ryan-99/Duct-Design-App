@@ -108,18 +108,29 @@ st.subheader("Current Path")
 
 for i, item in enumerate(st.session_state["path_items"]):
 
-    if item["type"] == "duct":
-        st.write(
-            f"{i+1}. Duct - "
-            f"{item['length_ft']} ft, "
-            f"{item['diameter_in']} in"
-        )
+    col1, col2 = st.columns([5,1])
 
-    elif item["type"] == "fitting":
-        st.write(
-            f"{i+1}. Fitting - "
-            f"{item['fitting_type']}"
-        )
+    with col1:
+        if item["type"] == "duct":
+            st.write(
+                f"{i+1}. Duct | "
+                f"{item['length_ft']} ft | "
+                f"{item['diameter_in']} in | "
+                f"{item['airflow_cfm']} CFM"
+            )
+
+        elif item["type"] == "fitting":
+            fitting_data = get_fitting(item["fitting_type"])
+            st.write(
+                f"{i+1}. {fitting_data['name']} | "
+                f"{item['diameter_in']} in | "
+                f"{item['airflow_cfm']} CFM"
+            )
+
+    with col2:
+        if st.button("Delete", key=f"delete_{i}"):
+            st.session_state["path_items"].pop(i)
+            st.rerun()
 
 
 ######  Calculation
