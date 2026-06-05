@@ -170,8 +170,6 @@ with col2:
 with col3:
     if st.button ("Clear Path"):
         st.session_state["path_items"] = []
-        duct_count = 0
-        fitting_count = 0
         st.rerun()
 
 with col4:
@@ -270,24 +268,8 @@ if canvas_result.json_data is not None:
                 (y2 - y1) ** 2
             )
 
-            # # Display length of line in pixels
-            # st.write(
-            #     f"Line Length: {pixel_length:.1f} pixels"
-            # )
-
             # Convert length to feet using inputted pixels/foot
             length_ft = pixel_length / pixels_per_foot
-
-            # # Display length of segment in feet
-            # st.write(
-            #     f"Length: {length_ft:.1f} ft"
-            # )
-
-            # # Display that a segment was created
-            # st.write(
-            #     f"Duct Segments Created: "
-            #     f"{len(canvas_segments)}"            
-            # )
 
             # Used for connectivity checks
             segments.append(
@@ -318,10 +300,6 @@ if canvas_result.json_data is not None:
                 connections.append(
                     (seg1["id"], seg2["id"])
                 )
-
-
-
-    st.write("hello world")
 
     path = Path(
         name = "Canvas Path",
@@ -367,7 +345,7 @@ for segment_id in adjacency:
 
         paths.append(current_path)
 
-
+"""
 st.subheader("canvas debug")
 st.write("segments")
 for segment in segments:
@@ -385,13 +363,7 @@ for seg1,seg2 in connections:
 st.write("grouped paths")
 for i, path in enumerate(paths, start=1):
     st.write(f"Path {i}: Segments {path}")
-
-#st.write(canvas_result.json_data)
-
-#####
-
-
-
+"""
 
 ######  Calculation
 if calculate:
