@@ -164,6 +164,20 @@ if canvas_result.json_data is not None:
         value=10.0,
     )
 
+    canvas_diameter_in = st.number_input(
+        "Canvas Duct Diameter (in)",
+        min_value=1.0,
+        value=12.0,
+    )
+
+    canvas_airflow_cfm = st.number_input(
+        "Canvas Airflow (CFM)",
+        min_value=0.0,
+        value=1000.0,
+    )
+
+    canvas_segments = []
+
     for obj in objects:
 
         if obj["type"] == "line":
@@ -186,11 +200,36 @@ if canvas_result.json_data is not None:
             
             length_ft = pixel_length / pixels_per_foot
 
+            canvas_segments.append(
+                DuctSegment(
+                    length_ft = length_ft,
+                    diameter_in = diameter_in,
+                    airflow_cfm = airflow_cfm
+                )
+            )
+
             st.write(
                 f"Length: {length_ft:.1f} ft"
             )
 
-    st.write(canvas_result.json_data)
+            st.write(
+                f"Duct Segments Created: "
+                f"{len(canvas_segments)}"            
+            )
+
+    path = Path(
+        name = "Canvas Path",
+        items = canvas_segments,
+    )
+
+    result = calculate_path_pressure_drop(path)
+
+    st.metric(
+        "Canvas Pressure Drop",
+        f"{result['total_pressure_drop_inwg']:.3f} in. w.g."
+    )
+
+    #st.write(canvas_result.json_data)
 
 #####
 
