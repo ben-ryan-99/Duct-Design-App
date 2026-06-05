@@ -313,13 +313,6 @@ if canvas_result.json_data is not None:
         f"{result['total_pressure_drop_inwg']:.3f} in. w.g."
     )
 
-st.subheader("Connections")
-
-for conn in connections:
-    st.write(
-        f"Segment {conn[0]} <> Segment {conn[1]}"
-    )
-
 adjacency = {}
 visited = set()
 for seg1,seg2 in connections:
