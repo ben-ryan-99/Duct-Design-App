@@ -1,5 +1,7 @@
 import streamlit as st
+from streamlit_drawable_canvas import st_canvas
 import json
+import math
 
 from ductcalc.models import DuctSegment, Fitting, Path
 from ductcalc.system import calculate_path_pressure_drop
@@ -49,8 +51,13 @@ with st.expander("Import / Export JSON", expanded=False):
     )
 #########
 
-st.title("Duct Pressure Drop Calculator")
 
+##### Title
+st.title("Duct Pressure Drop Calculator")
+#####
+
+
+##### Inputs
 st.subheader("Straight Duct")
 
 length_ft = st.number_input("Length (ft)", min_value=0.0, value=100.0)
@@ -100,10 +107,10 @@ with col3:
 
 with col4:
     calculate  = st.button("Calculate")
+#####
 
 
-
-# Display the item list
+##### Display the item list
 st.subheader("Current Path")
 
 for i, item in enumerate(st.session_state["path_items"]):
@@ -131,6 +138,48 @@ for i, item in enumerate(st.session_state["path_items"]):
         if st.button("Delete", key=f"delete_{i}"):
             st.session_state["path_items"].pop(i)
             st.rerun()
+#####
+
+##### Canvas Drawing
+st.subheader("Duct Layout Canvas")
+
+canvas_result = st_canvas(
+    fill_color="rgba(0, 0, 0, 0)",
+    stroke_width=4,
+    stroke_color="#000000",
+    background_color="#ffffff",
+    height=400,
+    width=700,
+    drawing_mode="line",
+    key="duct_canvas",
+)
+
+if canvas_result.json_data is not None:
+
+    objects = canvas_result.json_data.get("objects",[])
+
+    for obj in objects:
+
+        if obj["type"] == "line":
+            x1 = obj["x1"]
+            y1 = obj["y1"]
+
+            x2 = obj["x2"]
+            y2 = obj["y2"]
+
+            pixel_length = math.sqrt(
+                (x2 - x1) ** 2 +
+                (y2 - y1) ** 2
+            )
+
+            st.write(
+                f"Line Length: {pixel_length:.1f} pixels"
+            )
+    st.write(canvas_result.json_data)
+
+#####
+
+
 
 
 ######  Calculation
