@@ -1,11 +1,65 @@
+###################################################################################################################
+# Imports
+###################################################################################################################
+# Import standard python modules/packages
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import json
 import math
 
+# Imports from this project 
 from ductcalc.models import DuctSegment, Fitting, Path
 from ductcalc.system import calculate_path_pressure_drop
 from ductcalc.fitting_db import FITTINGS, get_fitting
+
+
+###################################################################################################################
+# Global Variables
+###################################################################################################################
+CONNECTION_TOLERANCE = 10
+
+
+###################################################################################################################
+# Helper Functions
+###################################################################################################################
+
+# Returns the distance between two points
+def point_distance(x1,y1,x2,y2):
+    return math.sqrt(
+        (x2 - x1) ** 2 +
+        (y2 - y1) ** 2
+    )
+
+# Returns whether two segments are connected
+def segments_connected(seg1, seg2):
+    endpoints1 = [
+        (seg1["x1"], seg1["y1"]),
+        (seg1["x2"], seg1["y2"]),
+    ]
+
+    endpoints2 = [
+        (seg2["x1"], seg2["y1"]),
+        (seg2["x2"], seg2["y2"]),
+    ]
+
+    for p1 in endpoints1:
+        for p2 in endpoints2:
+            if (
+                point_distance(
+                    p1[0],
+                    p1[1],
+                    p2[0],
+                    p2[1],
+                )
+                <= CONNECTION_TOLERANCE
+            ):
+                return True
+    return False
+
+
+###################################################################################################################
+# Code
+###################################################################################################################
 
 if "path_items" not in st.session_state:
     st.session_state["path_items"] = []
@@ -154,8 +208,13 @@ canvas_result = st_canvas(
     key="duct_canvas",
 )
 
+canvas_segments = []
+segments = []
+connections = []
+
 if canvas_result.json_data is not None:
 
+    
     objects = canvas_result.json_data.get("objects",[])
 
     pixels_per_foot = st.number_input(
@@ -176,30 +235,58 @@ if canvas_result.json_data is not None:
         value=1000.0,
     )
 
-    canvas_segments = []
+    
 
-    for obj in objects:
+    for i,obj in enumerate(objects):
 
         if obj["type"] == "line":
-            x1 = obj["x1"]
-            y1 = obj["y1"]
+            left = obj.get("left",0)
+            top = obj.get("top",0)
 
-            x2 = obj["x2"]
-            y2 = obj["y2"]
+            x1 = left + obj["x1"]
+            y1 = top + obj["y1"]
 
+            x2 = left + obj["x2"]
+            y2 = top + obj["y2"]
+
+            # Find the length of the line in pixels
             pixel_length = math.sqrt(
                 (x2 - x1) ** 2 +
                 (y2 - y1) ** 2
             )
 
-            st.write(
-                f"Line Length: {pixel_length:.1f} pixels"
-            )
+            # # Display length of line in pixels
+            # st.write(
+            #     f"Line Length: {pixel_length:.1f} pixels"
+            # )
 
-            
-            
+            # Convert length to feet using inputted pixels/foot
             length_ft = pixel_length / pixels_per_foot
 
+            # # Display length of segment in feet
+            # st.write(
+            #     f"Length: {length_ft:.1f} ft"
+            # )
+
+            # # Display that a segment was created
+            # st.write(
+            #     f"Duct Segments Created: "
+            #     f"{len(canvas_segments)}"            
+            # )
+
+            # Used for connectivity checks
+            segments.append(
+                {
+                    "id": i,
+                    "x1": x1,
+                    "y1": y1,
+                    "x2": x2,
+                    "y2": y2,
+                    "length_ft": length_ft,
+                }
+            )
+
+            # Create a new Duct Segment object from the inputs and add it to the canvas segments list
             canvas_segments.append(
                 DuctSegment(
                     length_ft = length_ft,
@@ -207,15 +294,19 @@ if canvas_result.json_data is not None:
                     airflow_cfm = airflow_cfm
                 )
             )
+    
+    for seg1 in segments:
+        for seg2 in segments:
+            if seg1["id"] >= seg2["id"]:
+                continue
+            if segments_connected(seg1, seg2):
+                connections.append(
+                    (seg1["id"], seg2["id"])
+                )
 
-            st.write(
-                f"Length: {length_ft:.1f} ft"
-            )
 
-            st.write(
-                f"Duct Segments Created: "
-                f"{len(canvas_segments)}"            
-            )
+
+    st.write("hello world")
 
     path = Path(
         name = "Canvas Path",
@@ -229,6 +320,13 @@ if canvas_result.json_data is not None:
         f"{result['total_pressure_drop_inwg']:.3f} in. w.g."
     )
 
+st.subheader("Connections")
+
+for conn in connections:
+    st.write(
+        f"Segment {conn[0]} <> Segment {conn[1]}"
+    )
+    
     #st.write(canvas_result.json_data)
 
 #####
@@ -308,3 +406,5 @@ if calculate:
         "Total Pressure Drop",
         f"{result['total_pressure_drop_inwg']:.3f} in. w.g.",
     )
+
+
